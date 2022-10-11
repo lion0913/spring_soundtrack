@@ -1,8 +1,8 @@
 package com.lion.spring_soundtrack.controller;
 
 
-import com.lion.spring_soundtrack.base.member.controller.MemberController;
-import com.lion.spring_soundtrack.base.member.service.MemberService;
+import com.lion.spring_soundtrack.app.member.controller.MemberController;
+import com.lion.spring_soundtrack.app.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

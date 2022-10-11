@@ -2,8 +2,8 @@ package com.lion.spring_soundtrack.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lion.spring_soundtrack.base.dto.ResultData;
-import com.lion.spring_soundtrack.config.AppConfig;
+import com.lion.spring_soundtrack.app.base.dto.ResultData;
+import com.lion.spring_soundtrack.app.config.AppConfig;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
