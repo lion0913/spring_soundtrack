@@ -25,5 +25,12 @@ public interface InitDataBefore {
         productService.create(song5, "슬픔", 3_900);
         productService.create(song7, "바다", 4_900);
         productService.create(song8, "안녕", 5_900);
+
+        memberService.addCash(member1, 10_000, "충전__무통장입금");
+        memberService.addCash(member1, 20_000, "충전__무통장입금");
+        memberService.addCash(member1, -5_000, "출금__일반");
+        memberService.addCash(member1, 1_000_000, "충전__무통장입금");
+
+        memberService.addCash(member2, 2_000_000, "충전__무통장입금");
     }
 }
