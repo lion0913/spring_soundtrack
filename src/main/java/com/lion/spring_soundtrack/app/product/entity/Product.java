@@ -30,4 +30,16 @@ public class Product extends BaseEntity {
     private Song song;
 
     private int price;
+
+    public int getSalePrice() {
+        return getPrice();
+    }
+
+    public int getWholeSalePrice() {
+        return (int)Math.ceil(getPrice() * 0.7);
+    }
+
+    public boolean isOrderable() {
+        return true;
+    }
 }
