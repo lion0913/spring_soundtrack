@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lion.spring_soundtrack.app.exception.ActorCanNotPayOrderException;
 import com.lion.spring_soundtrack.app.exception.ActorCanNotSeeOrderException;
 import com.lion.spring_soundtrack.app.exception.OrderIdNotMatchedException;
+import com.lion.spring_soundtrack.app.exception.OrderNotEnoughRestCashException;
 import com.lion.spring_soundtrack.app.member.entity.Member;
 import com.lion.spring_soundtrack.app.member.service.MemberService;
 import com.lion.spring_soundtrack.app.order.entity.Order;
@@ -77,7 +78,8 @@ public class OrderController {
     @RequestMapping("/{id}/success")
     public String confirmPayment(
             @PathVariable long id, @RequestParam String paymentKey, @RequestParam String orderId, @RequestParam Long amount,
-            Model model) throws Exception {
+            Model model,
+            @AuthenticationPrincipal MemberContext memberContext) throws Exception {
 
         Order order = orderService.findForPrintById(id).get();
         long orderIdInput = Long.parseLong(orderId.split("__")[1]);
@@ -94,7 +96,15 @@ public class OrderController {
 
         Map<String, String> payloadMap = new HashMap<>();
         payloadMap.put("orderId", orderId);
-        payloadMap.put("amount", String.valueOf(order.calculatePayPrice()));
+        payloadMap.put("amount", String.valueOf(amount));
+
+        Member actor = memberContext.getMember();
+        long restCash = memberService.getRestCash(actor);
+        long payPriceRestCash = order.calculatePayPrice() - amount;
+
+        if (payPriceRestCash > restCash) {
+            throw new OrderNotEnoughRestCashException();
+        }
 
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(payloadMap), headers);
 
@@ -102,7 +112,7 @@ public class OrderController {
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            orderService.payByTossPayments(order);
+            orderService.payByTossPayments(order, payPriceRestCash);
 //            JsonNode successNode = responseEntity.getBody();
 //            model.addAttribute("orderId", successNode.get("orderId").asText());
 //            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
