@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lion.spring_soundtrack.app.exception.ActorCanNotSeeOrderException;
 import com.lion.spring_soundtrack.app.exception.OrderIdNotMatchedException;
 import com.lion.spring_soundtrack.app.member.entity.Member;
+import com.lion.spring_soundtrack.app.member.service.MemberService;
 import com.lion.spring_soundtrack.app.order.entity.Order;
 import com.lion.spring_soundtrack.app.order.service.OrderService;
 import com.lion.spring_soundtrack.app.security.dto.MemberContext;
@@ -35,6 +36,8 @@ import java.util.Map;
 public class OrderController {
     private final OrderService orderService;
 
+    private final MemberService memberService;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     private final ObjectMapper objectMapper;
@@ -45,12 +48,14 @@ public class OrderController {
         Order order = orderService.findForPrintById(id).get();
 
         Member actor = memberContext.getMember();
+        long restCash = memberService.getRestCash(actor);
 
         if (orderService.actorCanSee(actor, order) == false) {
             throw new ActorCanNotSeeOrderException();
         }
 
         model.addAttribute("order", order);
+        model.addAttribute("actorRestCash", restCash);
 
         return "order/detail";
     }

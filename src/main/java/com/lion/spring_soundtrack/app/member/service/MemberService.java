@@ -47,11 +47,15 @@ public class MemberService {
 
         long newRestCash = member.getRestCash() + cashLog.getPrice();
         member.setRestCash(newRestCash);
+        memberRepository.save(member);
 
         return newRestCash;
     }
 
     public long getRestCash(Member member) {
-        return member.getRestCash();
+//        return member.getRestCash();
+        Member foundMember = findByUsername(member.getUsername()).get();
+//
+        return foundMember.getRestCash();
     }
 }
