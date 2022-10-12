@@ -1,4 +1,4 @@
-package com.lion.spring_soundtrack.app.song.exception;
+package com.lion.spring_soundtrack.app.exception;
 
 public class ActorCanNotModifyException extends RuntimeException {
 }

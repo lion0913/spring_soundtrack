@@ -2,6 +2,7 @@ package com.lion.spring_soundtrack.app.base.initData;
 
 import com.lion.spring_soundtrack.app.cart.service.CartService;
 import com.lion.spring_soundtrack.app.member.service.MemberService;
+import com.lion.spring_soundtrack.app.order.service.OrderService;
 import com.lion.spring_soundtrack.app.product.service.ProductService;
 import com.lion.spring_soundtrack.app.song.service.SongService;
 import org.springframework.boot.CommandLineRunner;
@@ -13,9 +14,9 @@ import org.springframework.context.annotation.Profile;
 @Profile("dev")
 public class DevInitData implements InitDataBefore {
     @Bean
-    CommandLineRunner initData(MemberService memberService, SongService songService, ProductService productService, CartService cartService) {
+    CommandLineRunner initData(MemberService memberService, SongService songService, ProductService productService, CartService cartService, OrderService orderService) {
         return args -> {
-            before(memberService, songService, productService, cartService);
+            before(memberService, songService, productService, cartService, orderService);
         };
     }
 }
