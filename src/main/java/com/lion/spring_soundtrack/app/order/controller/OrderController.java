@@ -4,6 +4,7 @@ package com.lion.spring_soundtrack.app.order.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lion.spring_soundtrack.app.exception.ActorCanNotSeeOrderException;
+import com.lion.spring_soundtrack.app.exception.OrderIdNotMatchedException;
 import com.lion.spring_soundtrack.app.member.entity.Member;
 import com.lion.spring_soundtrack.app.order.entity.Order;
 import com.lion.spring_soundtrack.app.order.service.OrderService;
@@ -71,8 +72,16 @@ public class OrderController {
 
     @RequestMapping("/{id}/success")
     public String confirmPayment(
-            @RequestParam String paymentKey, @RequestParam String orderId, @RequestParam Long amount,
+            @PathVariable long id, @RequestParam String paymentKey, @RequestParam String orderId, @RequestParam Long amount,
             Model model) throws Exception {
+
+        Order order = orderService.findForPrintById(id).get();
+        long orderIdInput = Long.parseLong(orderId.split("__")[1]);
+
+        // 주문번호 일치하는지 확인
+        if(id != orderIdInput) {
+            throw new OrderIdNotMatchedException();
+        }
 
         HttpHeaders headers = new HttpHeaders();
         // headers.setBasicAuth(SECRET_KEY, ""); // spring framework 5.2 이상 버전에서 지원
@@ -81,7 +90,7 @@ public class OrderController {
 
         Map<String, String> payloadMap = new HashMap<>();
         payloadMap.put("orderId", orderId);
-        payloadMap.put("amount", String.valueOf(amount));
+        payloadMap.put("amount", String.valueOf(order.calculatePayPrice()));
 
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(payloadMap), headers);
 
@@ -89,9 +98,10 @@ public class OrderController {
                 "https://api.tosspayments.com/v1/payments/" + paymentKey, request, JsonNode.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            JsonNode successNode = responseEntity.getBody();
-            model.addAttribute("orderId", successNode.get("orderId").asText());
-            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
+
+//            JsonNode successNode = responseEntity.getBody();
+//            model.addAttribute("orderId", successNode.get("orderId").asText());
+//            String secret = successNode.get("secret").asText(); // 가상계좌의 경우 입금 callback 검증을 위해서 secret을 저장하기를 권장함
             return "order/success";
         } else {
             JsonNode failNode = responseEntity.getBody();
