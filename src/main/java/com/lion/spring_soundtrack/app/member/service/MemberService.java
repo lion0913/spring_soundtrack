@@ -7,6 +7,8 @@ import com.lion.spring_soundtrack.app.member.entity.Member;
 import com.lion.spring_soundtrack.app.member.exception.AlreadyJoinException;
 import com.lion.spring_soundtrack.app.member.repository.MemberRepository;
 import com.lion.spring_soundtrack.util.Util;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ResultData<Map<String, Object>> addCash(Member member, long price, String eventType) {
+    public ResultData<AddCashRsDataBody> addCash(Member member, long price, String eventType) {
         CashLog cashLog = cashService.addCash(member, price, eventType);
 
         long newRestCash = member.getRestCash() + cashLog.getPrice();
@@ -55,12 +57,17 @@ public class MemberService {
         return ResultData.of(
                 "S-1",
                 "성공",
-                Util.mapOf(
-                        "cashLog", cashLog,
-                        "newRestCash", newRestCash
-                )
+                new AddCashRsDataBody(cashLog, newRestCash)
         );
     }
+
+    @Data
+    @AllArgsConstructor
+    public static class AddCashRsDataBody {
+        CashLog cashLog;
+        long newRestCash;
+    }
+
 
     public long getRestCash(Member member) {
 //        return member.getRestCash();

@@ -1,5 +1,6 @@
 package com.lion.spring_soundtrack.app.base.dto;
 
+import com.lion.spring_soundtrack.util.Util;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +35,13 @@ public class ResultData<T> {
 
     public boolean isFail() {
         return isSuccess() == false;
+    }
+
+    public String addMsgToUrl(String url) {
+        if ( isFail() ) {
+            return Util.url.modifyQueryParam(url, "errorMsg", getMsg());
+        }
+
+        return Util.url.modifyQueryParam(url, "msg", getMsg());
     }
 }
