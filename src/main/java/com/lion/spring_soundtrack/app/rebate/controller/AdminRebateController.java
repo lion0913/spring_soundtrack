@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -57,12 +58,33 @@ public class AdminRebateController {
         ResultData rebateRsData = rebateService.rebate(orderItemId);
 
         String referer = req.getHeader("Referer");
-        log.debug("referer : " + referer);
+
         String yearMonth = Util.url.getQueryParamValue(referer, "yearMonth", "");
 
         String redirect = "redirect:/admin/rebate/rebateOrderItemList?yearMonth=" + yearMonth;
 
         redirect = rebateRsData.addMsgToUrl(redirect);
+
+        return redirect;
+    }
+
+    @PostMapping("/rebate")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public String rebate(String ids, HttpServletRequest req) {
+
+        String[] idsArr = ids.split(",");
+
+        Arrays.stream(idsArr)
+                .mapToLong(Long::parseLong)
+                .forEach(id -> {
+                    rebateService.rebate(id);
+                });
+
+        String referer = req.getHeader("Referer");
+        String yearMonth = Util.url.getQueryParamValue(referer, "yearMonth", "");
+
+        String redirect = "redirect:/admin/rebate/rebateOrderItemList?yearMonth=" + yearMonth;
+        redirect += "&msg=" + Util.url.encode("%d건의 정산품목을 정산처리하였습니다.".formatted(idsArr.length));
 
         return redirect;
     }
