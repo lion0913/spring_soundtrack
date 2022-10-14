@@ -31,6 +31,16 @@ public class AdminRebateController {
     public String makeData(String yearMonth) {
         rebateService.makeDate(yearMonth);
 
-        return "성공";
+        return "redirect:/admin/rebate/rebateOrderItemList?yearMonth=" + yearMonth + "&msg=" + Util.url.encode("정산데이터가 성공적으로 생성되었습니다.");
+    }
+
+    @GetMapping("/rebateOrderItemList")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public String showRebateOrderItemList(String yearMonth) {
+        if (yearMonth == null) {
+            yearMonth = "2022-10";
+        }
+
+        return "admin/rebate/rebateOrderItemList";
     }
 }
