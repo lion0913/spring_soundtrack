@@ -1,7 +1,9 @@
 package com.lion.spring_soundtrack.app.rebate.controller;
 
 
+import com.lion.spring_soundtrack.app.rebate.service.RebateService;
 import com.lion.spring_soundtrack.util.Util;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +15,9 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/admin/rebate")
+@RequiredArgsConstructor
 public class AdminRebateController {
+    private final RebateService rebateService;
 
     @GetMapping("/makeData")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -25,13 +29,8 @@ public class AdminRebateController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseBody
     public String makeData(String yearMonth) {
-        int monthEndDay = Util.date.getEndDayOf(yearMonth);
+        rebateService.makeDate(yearMonth);
 
-        String fromDateStr = yearMonth + "-01 00:00:00.000000";
-        String toDateStr = yearMonth + "-%02d 23:59:59.999999".formatted(monthEndDay);
-        LocalDateTime fromDate = Util.date.parse(fromDateStr);
-        LocalDateTime toDate = Util.date.parse(toDateStr);
-
-        return "fromDateStr : %s<br>toDateStr : %s".formatted(fromDateStr, toDateStr);
+        return "성공";
     }
 }

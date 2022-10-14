@@ -6,12 +6,14 @@ import com.lion.spring_soundtrack.app.member.entity.Member;
 import com.lion.spring_soundtrack.app.member.service.MemberService;
 import com.lion.spring_soundtrack.app.order.entity.Order;
 import com.lion.spring_soundtrack.app.order.entity.OrderItem;
+import com.lion.spring_soundtrack.app.order.repository.OrderItemRepository;
 import com.lion.spring_soundtrack.app.order.repository.OrderRepository;
 import com.lion.spring_soundtrack.app.product.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,7 @@ public class OrderService {
     private final MemberService memberService;
     private final CartService cartService;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
     public Order createFromCart(Member buyer) {
@@ -122,5 +125,9 @@ public class OrderService {
 
     public boolean actorCanPayment(Member actor, Order order) {
         return actorCanSee(actor, order);
+    }
+
+    public List<OrderItem> findAllByPayDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+        return orderItemRepository.findAllByPayDateBetween(fromDate, toDate);
     }
 }
